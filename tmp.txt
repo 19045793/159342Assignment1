@@ -1,0 +1,21 @@
+ Volume in drive C is BOOTCAMP
+ Volume Serial Number is 0246-9FF7
+
+ Directory of C:\CORE\Massey_Papers\159342\assignments\A1\A1-START-UP\A1-START-UP-windows
+
+22/03/2023  07:28    <DIR>          .
+22/03/2023  07:28    <DIR>          ..
+18/02/2019  11:24           100,376 black.jpg
+22/03/2023  06:00                31 clean.bat
+22/03/2023  07:24    <DIR>          images
+21/03/2022  22:15               176 makefile
+20/03/2023  18:45               163 makefile - macOS
+20/03/2023  18:45             1,061 notes_on_mac_napoleon.txt
+20/03/2023  18:45             1,142 sample_ftp_ipv4_interaction.txt
+20/03/2023  18:45             1,173 sample_ftp_ipv6_interaction.txt
+22/03/2023  07:28            19,285 server.cpp
+22/03/2023  07:28           152,136 server.exe
+22/03/2023  07:28            10,522 server.o
+22/03/2023  07:29                 0 tmp.txt
+              11 File(s)        286,065 bytes
+               3 Dir(s)  139,015,036,928 bytes free
