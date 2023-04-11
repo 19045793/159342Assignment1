@@ -1,4 +1,3 @@
-
 //=======================================================================================================================
 // Course: 159.342
 // Description: Cross-platform, Active mode FTP SERVER, Start-up Code for Assignment 1 
@@ -17,7 +16,7 @@
 // Author: n.h.reyes@massey.ac.nz
 //=======================================================================================================================
 
-#define USE_IPV6 false  //if set to false, IPv4 addressing scheme will be used; you need to set this to true to 
+#define USE_IPV6 true  //if set to false, IPv4 addressing scheme will be used; you need to set this to true to 
 												//enable IPv6 later on.  The assignment will be marked using IPv6!
 
 #if defined __unix__ || defined __APPLE__
@@ -72,8 +71,8 @@ int main(int argc, char *argv[]) {
 		      exit(1);
 		 }
 	#endif		 
-		 struct sockaddr_in localaddr,remoteaddr;  //ipv4 only, needs replacing
-		 struct sockaddr_in local_data_addr_act;   //ipv4 only, needs replacing
+	struct sockaddr_in6 localaddr, remoteaddr;  //ipv4 only, needs replacing
+	struct sockaddr_in6 local_data_addr_act;   //ipv4 only, needs replacing
 
 	#if defined __unix__ || defined __APPLE__
 		 int s,ns;                //socket declaration
@@ -107,52 +106,44 @@ int main(int argc, char *argv[]) {
 	memset(&localaddr,0,sizeof(localaddr));//clean up the structure
 	memset(&remoteaddr,0,sizeof(remoteaddr));//clean up the structure
 		 
-//********************************************************************
-//SOCKET
-//********************************************************************
-	s = socket(AF_INET, SOCK_STREAM, 0); //old programming style, needs replacing
+	//********************************************************************
+	//SOCKET
+	//********************************************************************
+	s = socket(AF_INET6, SOCK_STREAM, 0); //old programming style, needs replacing
 	if (s <0) {
 		printf("socket failed\n");
 	}
-	localaddr.sin_family = AF_INET;
+	localaddr.sin6_family = AF_INET6;
 		 
-//CONTROL CONNECTION:  port number = content of argv[1]
+	//CONTROL CONNECTION:  port number = content of argv[1]
 	if (argc == 2) {
-		localaddr.sin_port = htons((u_short)atoi(argv[1])); //ipv4 only, needs replacing. In our lectures, we have an 
+		localaddr.sin6_port = htons((uint16_t)atoi(argv[1])); //ipv4 only, needs replacing. In our lectures, we have an 
 		 //elegant way of resolving the local address and port to 
-		//be used by the server.				
+		//be used by the server.	
 	}
 	else {
-		localaddr.sin_port = htons(1234);//default listening port //ipv4 only, needs replacing
+		localaddr.sin6_port = htons(1234);//default listening port //ipv4 only, needs replacing
 	}
-	localaddr.sin_addr.s_addr = INADDR_ANY;//server address should be local, old programming style, needs replacing
+	localaddr.sin6_family = AF_INET6;
+	localaddr.sin6_addr = in6addr_any;
 		 
-//********************************************************************
-//BIND
-//********************************************************************
+	//BIND
 	if (bind(s,(struct sockaddr *)(&localaddr),sizeof(localaddr)) != 0) { //old programming style, needs replacing
 		printf("Bind failed!\n");
 		exit(0);
 	}
 		 
-//********************************************************************
-//LISTEN
-//********************************************************************
+	//LISTEN
 	listen(s,5);
 		
-//********************************************************************
-//INFINITE LOOP
-//********************************************************************
+	//INFINITE LOOP
 	int count=0;
-//====================================================================================
+	//====================================================================================
 	while (1) {//Start of MAIN LOOP
-	 //====================================================================================
-		addrlen = sizeof(remoteaddr);
-	 //********************************************************************
-	 //NEW SOCKET newsocket = accept  //CONTROL CONNECTION
-	 //********************************************************************
+		socklen_t addrlen = sizeof(remoteaddr);
+	 	//NEW SOCKET newsocket = accept  //CONTROL CONNECTION
 		printf("\n------------------------------------------------------------------------\n");
-		printf("SERVER is waiting for an incoming connection request at port:%d", ntohs(localaddr.sin_port));
+		printf("SERVER is waiting for an incoming connection request at port:%d", ntohs(localaddr.sin6_port));
 		printf("\n------------------------------------------------------------------------\n");
 
 		#if defined __unix__ || defined __APPLE__ 
@@ -161,11 +152,19 @@ int main(int argc, char *argv[]) {
 			 ns = accept(s,(struct sockaddr *)(&remoteaddr), &addrlen); 
 		#endif
 		if (ns < 0 ) break;
+
+		char remoteIP[INET6_ADDRSTRLEN];
+		int remotePort;
+		char localIP[INET6_ADDRSTRLEN];
+		int localPort;
 				 
-		printf("\n============================================================================\n");
-		printf("connected to [CLIENT's IP %s , port %d] through SERVER's port %d",
-		inet_ntoa(remoteaddr.sin_addr),ntohs(remoteaddr.sin_port),ntohs(localaddr.sin_port)); //ipv4 only, needs replacing
-		printf("\n============================================================================\n");
+		printf("\n============================================================================\n");		
+		inet_ntop(AF_INET6, &(remoteaddr.sin6_addr), remoteIP, INET6_ADDRSTRLEN);
+		remotePort = ntohs(remoteaddr.sin6_port);
+		inet_ntop(AF_INET6, &(localaddr.sin6_addr), localIP, INET6_ADDRSTRLEN);
+		localPort = ntohs(localaddr.sin6_port);
+		printf("connected to [CLIENT's IP %s, port %d] through SERVER's port %d", remoteIP, remotePort, localPort);
+		printf("\n========================	====================================================\n");
 		//printf("detected CLIENT's port number: %d\n", ntohs(remoteaddr.sin_port));
 
 		//printf("connected to CLIENT's IP %s at port %d of SERVER\n",
@@ -356,7 +355,8 @@ int main(int argc, char *argv[]) {
 				//local variables
 				//unsigned char act_port[2];
 				int act_port[2];
-				int act_ip[4], port_dec;
+				int act_ip[4];
+				uint16_t port_dec;
 				char ip_decimal[NI_MAXHOST];
 				printf("===================================================\n");
 				printf("\tActive FTP mode, the client is listening... \n");
@@ -375,27 +375,28 @@ int main(int argc, char *argv[]) {
 					if (bytes < 0) break;			      
 		    	}
 					 
-				local_data_addr_act.sin_family=AF_INET;//local_data_addr_act  //ipv4 only, needs to be replaced.
+				local_data_addr_act.sin6_family=AF_INET;//local_data_addr_act  //ipv4 only, needs to be replaced.
 				count=snprintf(ip_decimal,NI_MAXHOST, "%d.%d.%d.%d", act_ip[0], act_ip[1], act_ip[2],act_ip[3]);
 
 				if(!(count >=0 && count < BUFFER_SIZE)) break;
 					 
 				printf("\tCLIENT's IP is %s\n",ip_decimal);  //IPv4 format
-				local_data_addr_act.sin_addr.s_addr=inet_addr(ip_decimal);  //ipv4 only, needs to be replaced.
-				port_dec=act_port[0];
-				port_dec=port_dec << 8;
-				port_dec=port_dec+act_port[1];
+				if (inet_pton(AF_INET6, ip_decimal, &(local_data_addr_act.sin6_addr)) != 1) break;
+				port_dec = (act_port[0] << 8) + act_port[1];
 				printf("\tCLIENT's Port is %d\n",port_dec);
 				printf("===================================================\n");
 					 
-				local_data_addr_act.sin_port=htons(port_dec); //ipv4 only, needs to be replaced
+				local_data_addr_act.sin6_port=htons(port_dec); //ipv4 only, needs to be replaced
 
 
            		//Note: the following connect() function is not correctly placed.  It works, but technically, as defined by
            		// the protocol, connect() should occur in another place.  Hint: carefully inspect the lecture on FTP, active operations 
            		// to find the answer. 
 				if (connect(s_data_act, (struct sockaddr *)&local_data_addr_act, (int) sizeof(struct sockaddr)) != 0){
-					printf("trying connection in %s %d\n",inet_ntoa(local_data_addr_act.sin_addr),ntohs(local_data_addr_act.sin_port));
+					char ip_str[INET6_ADDRSTRLEN];
+					uint16_t port = ntohs(local_data_addr_act.sin6_port);
+					inet_ntop(AF_INET6, &(local_data_addr_act.sin6_addr), ip_str, INET6_ADDRSTRLEN);
+					printf("trying connection in %s %d\n", ip_str, port);
 					count=snprintf(send_buffer,BUFFER_SIZE, "425 Something is wrong, can't start active connection... \r\n");
 					if(count >=0 && count < BUFFER_SIZE){
 						bytes = send(ns, send_buffer, strlen(send_buffer), 0);
@@ -481,16 +482,19 @@ int main(int argc, char *argv[]) {
 		}//End of COMMUNICATION LOOP per CLIENT
 		//=================================================================================
 			 
-//********************************************************************
-//CLOSE SOCKET
-//********************************************************************
+	//********************************************************************
+	//CLOSE SOCKET
+	//********************************************************************
 			 
 		#if defined __unix__ || defined __APPLE__ 
 			close(ns);
 		#elif defined _WIN32	
 			closesocket(ns);
 		#endif
-		printf("DISCONNECTED from %s\n",inet_ntoa(remoteaddr.sin_addr)); //IPv4 only, needs replacing
+		char ip_str[INET6_ADDRSTRLEN];
+		struct sockaddr_in6 *s = (struct sockaddr_in6 *)&remoteaddr;
+		inet_ntop(AF_INET6, &(s->sin6_addr), ip_str, INET6_ADDRSTRLEN);
+		printf("DISCONNECTED from %s\n", ip_str); //IPv4 only, needs replacing
 
 			 
 		 //====================================================================================
