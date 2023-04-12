@@ -503,62 +503,39 @@ int main(int argc, char *argv[])
 			}
 			//---
 			char ip_decimal[NI_MAXHOST];
-			if (strncmp(receive_buffer, "PORT", 4) == 0)
-			{
-				int act_port[2], port_dec;
-				printf("===================================================\n");
-				printf("\tActive FTP mode, the client is listening... \n");
-				active = 1; // flag for active connection
-				if (USE_IPV6)
-				{
-					s_data_act = socket(AF_INET6, SOCK_STREAM, 0);
-					// local variables
-					// unsigned char act_port[2];
-					char act_ip[8];
+                 if (strncmp(receive_buffer, "PORT", 4) == 0) {
+                     struct addrinfo *clientResult = NULL;
+                     int act_port[2], port_dec;
+                     printf("===================================================\n");
+                     printf("\tActive FTP mode, the client is listening... \n");
+                     active = 1; // flag for active connection --- idk what this does
+                     int act_ip[4];
+                     int scannedItems = sscanf(receive_buffer, "PORT %d,%d,%d,%d,%d,%d",
+                                               &act_ip[0], &act_ip[1], &act_ip[2], &act_ip[3],
+                                               &act_port[0], &act_port[1]);
+                     if (scannedItems < 6) {
+                         count = snprintf(send_buffer, BUFFER_SIZE, "501 Syntax error in arguments \r\n");
+                         if (count >= 0 && count < BUFFER_SIZE) {
+                             bytes = send(ns, send_buffer, strlen(send_buffer), 0);
+                         }
+                         printf("[DEBUG INFO] <-- %s\n", send_buffer);
+                         if (bytes < 0)
+                             break;
+                     }
+                     port_dec = act_port[0];
+                     port_dec = port_dec << 8;
+                     port_dec = port_dec + act_port[1];
+                     char *tempCString;
+                     itoa(port_dec, tempCString, sizeof port_dec);
+                     int status = getaddrinfo(ip_decimal, tempCString, &clientHints, &clientResult);
+                     if(status!=0) {
+                         break;
+                     }
 
-					int scannedItems = sscanf(receive_buffer, "PORT %s,%s,%s,%s,%s,%s,%s,%s,%d,%d",
-											  &act_ip[0], &act_ip[1], &act_ip[2], &act_ip[3], &act_ip[4], &act_ip[5], &act_ip[6], &act_ip[7],
-											  &act_port[0], &act_port[1]);
-					if (scannedItems < 10)
-					{
-						count = snprintf(send_buffer, BUFFER_SIZE, "501 Syntax error in arguments \r\n");
-						if (count >= 0 && count < BUFFER_SIZE)
-						{
-							bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-						}
-						printf("[DEBUG INFO] <-- %s\n", send_buffer);
-						if (bytes < 0)
-							break;
-						count = snprintf(ip_decimal, NI_MAXHOST, "%c.%c.%c.%c.%c.%c.%c.%c", act_ip[0], act_ip[1], act_ip[2], act_ip[3], act_ip[4], act_ip[5], act_ip[6], act_ip[7]);
-					}
-					local_data_addr_act.ss_family = AF_INET6;
-				}
-				else
-				{ // IPV4
-
-					s_data_act = socket(AF_INET, SOCK_STREAM, 0);
-					// local variables
-					// unsigned char act_port[2];
-					int act_ip[4];
-					int scannedItems = sscanf(receive_buffer, "PORT %d,%d,%d,%d,%d,%d",
-											  &act_ip[0], &act_ip[1], &act_ip[2], &act_ip[3],
-											  &act_port[0], &act_port[1]);
-
-					if (scannedItems < 6)
-					{
-						count = snprintf(send_buffer, BUFFER_SIZE, "501 Syntax error in arguments \r\n");
-						if (count >= 0 && count < BUFFER_SIZE)
-						{
-							bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-						}
-						printf("[DEBUG INFO] <-- %s\n", send_buffer);
-						if (bytes < 0)
-							break;
-					}
-					local_data_addr_act.ss_family = AF_INET;
-					count = snprintf(ip_decimal, NI_MAXHOST, "%d.%d.%d.%d", act_ip[0], act_ip[1], act_ip[2], act_ip[3]);
-				}
-
+                     count = snprintf(ip_decimal, NI_MAXHOST, "%d.%d.%d.%d", act_ip[0], act_ip[1], act_ip[2],
+                                      act_ip[3]);
+                     s_data_act = socket(clientResult->ai_family, clientResult->ai_socktype, clientResult->ai_protocol);
+                 }
 				if (!(count >= 0 && count < BUFFER_SIZE))
 					break;
 
