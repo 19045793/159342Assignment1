@@ -525,6 +525,8 @@ int main(int argc, char *argv[])
 	             port_dec = act_port[0];
                      port_dec = port_dec << 8;
                      port_dec = port_dec + act_port[1];
+                     count = snprintf(ip_decimal, NI_MAXHOST, "%d.%d.%d.%d", act_ip[0], act_ip[1], act_ip[2],
+                                      act_ip[3]);
                      itoa(port_dec, clientService, sizeof port_dec);
                      strcpy(clientHost, ip_decimal);
                      int status = getaddrinfo(clientHost, clientService, &clientHints, &clientResult);
@@ -532,8 +534,6 @@ int main(int argc, char *argv[])
                          break;
                      }
 
-                     count = snprintf(ip_decimal, NI_MAXHOST, "%d.%d.%d.%d", act_ip[0], act_ip[1], act_ip[2],
-                                      act_ip[3]);
                      s_data_act = socket(clientResult->ai_family, clientResult->ai_socktype, clientResult->ai_protocol);
                  }
                  printf("\tCLIENT's IP is %s\n", clientHost); // IPv4 format
