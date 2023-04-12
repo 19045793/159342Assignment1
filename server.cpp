@@ -522,12 +522,12 @@ int main(int argc, char *argv[])
                          if (bytes < 0)
                              break;
                      }
-                     port_dec = act_port[0];
+	             port_dec = act_port[0];
                      port_dec = port_dec << 8;
                      port_dec = port_dec + act_port[1];
-                     char *tempCString;
-                     itoa(port_dec, tempCString, sizeof port_dec);
-                     int status = getaddrinfo(ip_decimal, tempCString, &clientHints, &clientResult);
+                     itoa(port_dec, clientService, sizeof port_dec);
+                     strcpy(clientHost, ip_decimal);
+                     int status = getaddrinfo(clientHost, clientService, &clientHints, &clientResult);
                      if(status!=0) {
                          break;
                      }
@@ -536,17 +536,10 @@ int main(int argc, char *argv[])
                                       act_ip[3]);
                      s_data_act = socket(clientResult->ai_family, clientResult->ai_socktype, clientResult->ai_protocol);
                  }
-				if (!(count >= 0 && count < BUFFER_SIZE))
-					break;
-
-				printf("\tCLIENT's IP is %s\n", ip_decimal); // IPv4 format
-				strcpy(clientHost, ip_decimal);				 // ipv4 only, needs to be replaced.
-				port_dec = act_port[0];
-				port_dec = port_dec << 8;
-				port_dec = port_dec + act_port[1];
-				printf("\tCLIENT's Port is %d\n", port_dec);
-				printf("===================================================\n");
-				sprintf(clientService, "%d", port_dec);
+                 printf("\tCLIENT's IP is %s\n", clientHost); // IPv4 format
+                 printf("\tCLIENT's Port is %s\n", clientService);
+                 printf("===================================================\n");
+                 sprintf(clientService, "%s", clientHost);
 
 				// Note: the following connect() function is not correctly placed.  It works, but technically, as defined by
 				//  the protocol, connect() should occur in another place.  Hint: carefully inspect the lecture on FTP, active operations
