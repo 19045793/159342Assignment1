@@ -438,18 +438,43 @@ int main(int argc, char *argv[])
 					break;
 			}
 			//---
-			if (strncmp(receive_buffer, "EPRT", 4) == 0)
-			{ // more work needs to be done here
-				printf("unrecognised command \n");
-				count = snprintf(send_buffer, BUFFER_SIZE, "502 command not implemented\r\n");
-				if (count >= 0 && count < BUFFER_SIZE)
-				{
-					bytes = send(ns, send_buffer, strlen(send_buffer), 0);
-				}
-				printf("[DEBUG INFO] <-- %s\n", send_buffer);
-				if (bytes < 0)
-					break;
-			}
+			if (strncmp(receive_buffer,"EPRT",4)==0)  {  //more work needs to be done here
+                     struct addrinfo *clientResult = NULL;
+                     struct addrinfo clientHints;
+                     clientHints.ai_socktype = SOCK_STREAM;
+                     clientHints.ai_protocol = IPPROTO_TCP;
+                     clientHints.ai_family = AI_NUMERICHOST;
+                     char tempString[strlen(receive_buffer)];
+                     char* ptr;
+                     strcpy(tempString,receive_buffer);
+                     strcpy(tempString, tempString+6);
+                     strcpy(tempString, tempString+4);
+                     ptr = strchr( tempString,  '|');
+                     int index = (int)(ptr - tempString);
+                     strcpy(clientHost, tempString);
+                     clientHost[index-2]='\0';
+                     int i=0;
+                     while(clientHost[i]!='\0'){
+                         if(clientHost[i]==',') {
+                             clientHost[i] = ':';
+                         }
+                         i++;
+                     }
+                     strcpy(clientService, tempString+index+1);
+                     clientService[strlen(clientService)-2]='\0';
+                     int status = getaddrinfo(clientHost, clientService, &clientHints, &clientResult);
+                     if (status != 0){
+		         break;
+		     }
+#if defined __unix__ || defined __APPLE__
+                     s_data_act = -1;
+#elif defined _WIN32
+                     s_data_act = INVALID_SOCKET;
+#endif
+
+                     s_data_act = socket(clientResult->ai_family, clientResult->ai_socktype, clientResult->ai_protocol);
+
+                 }
 			//---
 			if (strncmp(receive_buffer, "CWD", 3) == 0)
 			{
