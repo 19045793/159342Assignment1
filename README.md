@@ -4,7 +4,7 @@
 ## Checklist
 |      Item                                |     Assignment Details |
 | -----------------------------------------|  -----------------  |
-| Names and ID                             | Samuel Tweeddale 19045793, Jasmine Fitt 23011273 | 
+| Names and ID                             | Samuel Tweeddale 19045793, Jasmine Fitt 23011273, Jasper Harcombe 20013000 | 
 | OS Systems Used                          | Windows, MacOS | 
 | Compiler                                 | g++ 12.2.0 | 
 | IDE                                      |  CLion and VSCode |
