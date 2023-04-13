@@ -125,17 +125,18 @@ int main(int argc, char *argv[])
 	struct addrinfo hints;
 	int iResult;
 	memset(&hints, 0, sizeof(struct addrinfo));
-	if (USE_IPV6)
-	{
-		hints.ai_family = AF_INET6;
-	}
-	else
-	{ // IPV4
-		hints.ai_family = AF_INET;
-	}
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	hints.ai_flags = AI_PASSIVE;
+        memset(&clientHints, 0, sizeof(struct addrinfo));
+    if(USE_IPV6){
+             hints.ai_family = AF_INET6;
+         }	 else { //IPV4
+             hints.ai_family = AF_INET;
+         }
+         hints.ai_socktype = SOCK_STREAM;
+         hints.ai_protocol = IPPROTO_TCP;
+         hints.ai_flags = AI_PASSIVE;
+         clientHints.ai_socktype = SOCK_STREAM;
+         clientHints.ai_protocol = IPPROTO_TCP;
+         clientHints.ai_family = AI_NUMERICHOST;
 	// CONTROL CONNECTION:  port number = content of argv[1]
 	if (argc == 2)
 	{
