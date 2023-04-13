@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
 	//********************************************************************
 	struct addrinfo *result = NULL;
 	struct addrinfo hints;
+	struct addrinfo clientHints;
 	int iResult;
 	memset(&hints, 0, sizeof(struct addrinfo));
         memset(&clientHints, 0, sizeof(struct addrinfo));
