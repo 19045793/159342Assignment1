@@ -537,7 +537,6 @@ int main(int argc, char *argv[])
                      }
 
                      s_data_act = socket(clientResult->ai_family, clientResult->ai_socktype, clientResult->ai_protocol);
-                 }
                  printf("\tCLIENT's IP is %s\n", clientHost); // IPv4 format
                  printf("\tCLIENT's Port is %s\n", clientService);
                  printf("===================================================\n");
