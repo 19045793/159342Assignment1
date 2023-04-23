@@ -15,14 +15,14 @@ Follow the provided ‘Sample_ftp_ipv6_interaction’ for further instruction.
 | Compiler                                 | g++ 12.2.0 | 
 | IDE                                      | CLion and VSCode |
 | makefile                                 | Yes |
-| Source Codes                             | Yes/No |
-| Other Support Files                      | Yes/No |
-| EPRT Command                             | Full/Partial/None |
-| LIST Command                             | Full/Partial/None | 
-| RETR Command                             | Full/Partial/None | 
-| TYPE Command                             | Full/Partial/None | 
-| Client can connect to FTP (IPv6)         | Full/Partial/None | 
-| Client can disconnect to FTP (IPv6)      | Full/Partial/None | 
-| Client can reconnect to FTP (IPv6)       | Full/Partial/None | 
-| Include snapshots of sample interactions | Yes/No |
+| Source Codes                             | No |
+| Other Support Files                      | No |
+| EPRT Command                             | Full |
+| LIST Command                             | Full | 
+| RETR Command                             | Full | 
+| TYPE Command                             | Full | 
+| Client can connect to FTP (IPv6)         | Partial | 
+| Client can disconnect to FTP (IPv6)      | Partial | 
+| Client can reconnect to FTP (IPv6)       | Partial | 
+| Include snapshots of sample interactions | Yes |
 
