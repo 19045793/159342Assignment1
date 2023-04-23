@@ -1,5 +1,6 @@
 # 159342Assignment1 
 ## Documentation
+The purpose of this program is to provide an IPv4 and IPv6 compliant FTP server that correctly communicates with the client.
 
 ## Checklist
 |      Item                                |     Assignment Details |
